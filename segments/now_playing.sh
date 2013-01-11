@@ -8,6 +8,7 @@ TMUX_POWERLINE_SEG_NOW_PLAYING_ROLL_SPEED_DEFAULT="2"
 TMUX_POWERLINE_SEG_NOW_PLAYING_MPD_HOST_DEFAULT="localhost"
 TMUX_POWERLINE_SEG_NOW_PLAYING_MPD_PORT_DEFAULT="6600"
 TMUX_POWERLINE_SEG_NOW_PLAYING_LASTFM_UPDATE_PERIOD_DEFAULT="30"
+TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER="rdio_itunes"
 
 generate_segmentrc() {
 	read -d '' rccontents  << EORC
@@ -41,23 +42,32 @@ run_segment() {
 	fi
 
 	local np
-	case "$TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER" in
-		"audacious")  np=$(__np_audacious) ;;
-		"banshee")  np=$(__np_banshee) ;;
-		"cmus")  np=$(__np_cmus) ;;
-		"itunes")  np=$(__np_itunes) ;;
-		"lastfm")  np=$(__np_lastfm) ;;
-		"mocp")  np=$(__np_mocp) ;;
-		"mpd")  np=$(__np_mpd) ;;
-		"mpd_simple")  np=$(__np_mpd_simple) ;;
-		"rdio")  np=$(__np_rdio) ;;
-		"rhythmbox")  np=$(__np_rhythmbox) ;;
-		"spotify")  np=$(__np_spotify) ;;
-		"spotify_wine")  np=$(__np_spotify_native) ;;
-		*)
-			echo "Unknown music player type [${TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER}]";
-			return 1
-	esac
+  case "$TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER" in
+    "audacious")  np=$(__np_audacious) ;;
+    "banshee")  np=$(__np_banshee) ;;
+    "cmus")  np=$(__np_cmus) ;;
+    "itunes")  np=$(__np_itunes) ;;
+    "lastfm")  np=$(__np_lastfm) ;;
+    "mocp")  np=$(__np_mocp) ;;
+    "mpd")  np=$(__np_mpd) ;;
+    "mpd_simple")  np=$(__np_mpd_simple) ;;
+    "rdio")  np=$(__np_rdio) ;;
+    "rhythmbox")  np=$(__np_rhythmbox) ;;
+    "spotify")  np=$(__np_spotify) ;;
+    "spotify_wine")  np=$(__np_spotify_native) ;;
+    "rdio_itunes")
+        if [[ $(ps x | grep iTunes\[\[:space:\]\]) ]]; then
+          np_i=$(__np_itunes)
+        fi
+        if [[ $(ps x | grep Rdio\[\[:space:\]\]) ]]; then
+          np_r=$(__np_rdio)
+        fi
+        np="$np_r$np_i"
+    ;;
+    *)
+      echo "Unknown music player type [${TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER}]";
+      return 1
+  esac
 	local exitcode="$?"
 	if [ "${exitcode}" -ne 0 ]; then
 		return ${exitcode}
@@ -95,6 +105,7 @@ __process_settings() {
 	if [ -z "$TMUX_POWERLINE_SEG_NOW_PLAYING_LASTFM_UPDATE_PERIOD" ]; then
 		export TMUX_POWERLINE_SEG_NOW_PLAYING_LASTFM_UPDATE_PERIOD="${TMUX_POWERLINE_SEG_NOW_PLAYING_LASTFM_UPDATE_PERIOD_DEFAULT}"
 	fi
+
 }
 
 __np_mpd() {

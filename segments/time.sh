@@ -17,6 +17,6 @@ __process_settings() {
 }
 
 run_segment() {
-	date +"$TMUX_POWERLINE_SEG_TIME_FORMAT"
+	date +%H:%M
 	return 0
 }

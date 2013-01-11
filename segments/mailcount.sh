@@ -88,7 +88,11 @@ run_segment() {
 
 
 __count_apple_mail() {
-	count=$(${TMUX_POWERLINE_DIR_SEGMENTS}/mailcount_apple_mail.script)
+  if [[ $(ps x | grep Mail\[\[:space:\]\]) ]]; then
+    count=$(${TMUX_POWERLINE_DIR_SEGMENTS}/mailcount_apple_mail.script)
+  else
+    count=0
+  fi
 	echo "$count"
 }
 
